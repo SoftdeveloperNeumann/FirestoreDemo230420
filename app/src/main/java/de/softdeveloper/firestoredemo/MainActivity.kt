@@ -2,11 +2,14 @@ package de.softdeveloper.firestoredemo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import de.softdeveloper.firestoredemo.databinding.ActivityMainBinding
+import io.grpc.internal.LogExceptionRunnable
 
 data class User(
     val first:String,
@@ -28,14 +31,14 @@ class MainActivity : AppCompatActivity() {
 
         val userCollection = db.collection("users")
 
-        userCollection.get()
-            .addOnCompleteListener {task ->
-                if (task.isSuccessful){
-                    for(document in task.result){
-                        binding.tvOutput.append("User: ${document.id}, ${document.data} name: ${document.get("first")} \n")
-                    }
-                }
-            }
+//        userCollection.get()
+//            .addOnCompleteListener {task ->
+//                if (task.isSuccessful){
+//                    for(document in task.result){
+//                        binding.tvOutput.append("User: ${document.id}, ${document.data} name: ${document.get("first")} \n")
+//                    }
+//                }
+//            }
         val u1 = User("frank","Neumann","Berlin",53)
         val u2 = User("peter","Meier","Hamburg",45)
         val u3 = User("Horst","Schulze","Berlin",60)
@@ -57,12 +60,21 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
         binding.tvOutput.text =""
-        userCollection.whereGreaterThan("age",50).get()
+        userCollection.whereGreaterThan("age",50).get(Source.DEFAULT)
             .addOnSuccessListener {
                 it.forEach {
                     binding.tvOutput.append(it.get("last").toString() + "\n")
+
                 }
             }
+//        val user3 = userCollection.document("3")
+//        user3.update("city","Bremen")
+//            .addOnSuccessListener { Toast.makeText(this, "Änderung erfolgreich", Toast.LENGTH_SHORT).show() }
+//
+//        user3.delete()
+//            .addOnSuccessListener { Toast.makeText(this, "User 3 wurde gelöscht", Toast.LENGTH_SHORT).show() }
+        Log.e("TAG", "onCreate: ${ db.collection("Zutaten").document("Zucker").id} ", )
+        
     }
 
     fun createUsersDummy(){
